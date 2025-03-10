@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vqa_app/view/home/home_screen.dart';
 import 'package:vqa_app/view/home/login/login_screen.dart';
 import 'package:vqa_app/view/home/register/register_screen.dart';
 import 'package:vqa_app/view/splash/splash_screen.dart';
@@ -17,8 +18,9 @@ class MyApplication extends StatelessWidget{
       splashScreen.routeName : (context) => splashScreen(),
       loginScreen.routeName : (context) => loginScreen(),
       registerScreen.routeName : (context) => registerScreen(),
+       homeScreen.routeName : (context) => homeScreen(),
      },
-     initialRoute: splashScreen.routeName ,
+     initialRoute: homeScreen.routeName ,
      theme: MyThemeData.lightTheme,
    );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class MyThemeData {
 
   static ThemeData lightTheme = ThemeData(
+    scaffoldBackgroundColor: Colors.transparent,
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
