@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vqa_app/view/home/home_screen.dart';
 import 'package:vqa_app/view/home/login/login_screen.dart';
 import 'package:vqa_app/view/home/register/register_screen.dart';
+import 'package:vqa_app/view/home/settings/settings_screen.dart';
 import 'package:vqa_app/view/splash/splash_screen.dart';
 import 'package:vqa_app/view/styles/my_theme_data.dart';
 
@@ -19,6 +20,7 @@ class MyApplication extends StatelessWidget{
       loginScreen.routeName : (context) => loginScreen(),
       registerScreen.routeName : (context) => registerScreen(),
        homeScreen.routeName : (context) => homeScreen(),
+       settings_screen.routeName : (context) => settings_screen(),
      },
      initialRoute: homeScreen.routeName ,
      theme: MyThemeData.lightTheme,

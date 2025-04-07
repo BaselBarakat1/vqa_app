@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vqa_app/view/home/settings/settings_screen.dart';
 
 class HomeDrawer extends StatelessWidget {
 
@@ -11,24 +12,34 @@ class HomeDrawer extends StatelessWidget {
         padding: EdgeInsets.all(12),
         child: Column(
          children: [
-           Padding(
-             padding: const EdgeInsets.all(12),
-             child: Row(
-               children: [
-                 Icon(Icons.history_outlined,size: 28,color: Colors.white,),
-                 SizedBox(width: 11.5,),
-                 Text('History',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.w400),)
-               ],
+           InkWell(
+             onTap: () {
+
+             },
+             child: Padding(
+               padding: const EdgeInsets.all(12),
+               child: Row(
+                 children: [
+                   Icon(Icons.history_outlined,size: 28,color: Colors.white,),
+                   SizedBox(width: 11.5,),
+                   Text('History',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.w400),)
+                 ],
+               ),
              ),
            ),
-           Padding(
-             padding: const EdgeInsets.all(12),
-             child: Row(
-               children: [
-                 Icon(Icons.settings_outlined,size: 28,color: Colors.white,),
-                 SizedBox(width: 11.5,),
-                 Text('Settings',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.w400),)
-               ],
+           InkWell(
+             onTap: () {
+               Navigator.pushNamed(context, settings_screen.routeName);
+             },
+             child: Padding(
+               padding: const EdgeInsets.all(12),
+               child: Row(
+                 children: [
+                   Icon(Icons.settings_outlined,size: 28,color: Colors.white,),
+                   SizedBox(width: 11.5,),
+                   Text('Settings',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.w400),)
+                 ],
+               ),
              ),
            ),
            Container(

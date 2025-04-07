@@ -12,5 +12,12 @@ class MyThemeData {
           textStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontSize: 14),
         )
     ),
+    appBarTheme: AppBarTheme(
+      color: Colors.transparent,
+      centerTitle: true,
+      iconTheme: IconThemeData(
+        color: Colors.white
+      )
+    )
   );
 }
