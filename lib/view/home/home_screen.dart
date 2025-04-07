@@ -16,7 +16,6 @@ static const String routeName = 'Home_Screen';
       ),
      child: Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         title: Text('VQA',style: TextStyle(fontWeight:FontWeight.bold,fontSize:24 ,color: Colors.white)),
         leading: IconButton(
             icon: Icon(Icons.menu_outlined,color: Colors.white,size: 24),
@@ -27,7 +26,6 @@ static const String routeName = 'Home_Screen';
                 _scaffoldKey.currentState?.openEndDrawer();
               }
             }),
-        centerTitle: true,
       ),
        body: Scaffold(
          key: _scaffoldKey,
