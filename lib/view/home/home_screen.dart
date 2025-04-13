@@ -1,9 +1,33 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vqa_app/view/home/home_drawer.dart';
+import 'package:vqa_app/view/widgets/image_widget.dart';
 import 'package:vqa_app/view/widgets/question_text_field.dart';
+import 'package:vqa_app/view/widgets/question_widget.dart';
 
-class homeScreen extends StatelessWidget {
+class homeScreen extends StatefulWidget {
 static const String routeName = 'Home_Screen';
+
+  @override
+  State<homeScreen> createState() => _homeScreenState();
+}
+
+class _homeScreenState extends State<homeScreen> {
+File? file;
+TextEditingController questionController = TextEditingController();
+int index =0;
+
+getImage() async {
+  final ImagePicker picker = ImagePicker();
+// Pick an image.
+ final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+// Capture a photo.
+ // final XFile? photoCamera = await picker.pickImage(source: ImageSource.camera);
+  file = File(image!.path);
+  setState(() {});
+}
+
   @override
   Widget build(BuildContext context) {
     GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
@@ -33,31 +57,65 @@ static const String routeName = 'Home_Screen';
          body: Container(
            padding: EdgeInsets.all(14),
            child: Column(
-             mainAxisAlignment: MainAxisAlignment.end,
-             crossAxisAlignment: CrossAxisAlignment.stretch,
+             //crossAxisAlignment: CrossAxisAlignment.end,
              children: [
                Container(
-                 padding: EdgeInsets.only(bottom: 182),
+                 padding: EdgeInsets.symmetric(horizontal: 12,vertical: 24),
                  child: Column(
                    children: [
-                     Padding(
-                       padding: EdgeInsets.symmetric(vertical: 35),
-                       child: Text('Wondering\nabout an Image?',textAlign: TextAlign.center,style: TextStyle(
-                         color: Colors.white,
-                         fontSize: 40,
-                         fontWeight:FontWeight.w400,
-                       )),
+                     if(index == 1 ) Padding(
+                       padding: const EdgeInsets.symmetric(vertical: 8),
+                       child: questionWidget(Question: questionController.text,),
                      ),
-                     Text("I'm here to help!",textAlign: TextAlign.center,style: TextStyle(
-                       color: Colors.white,
-                       fontSize: 40,
-                       fontWeight:FontWeight.w400,
-                     )),
+                     if(file != null) ClipRRect(
+                         borderRadius: BorderRadius.only(bottomLeft:Radius.circular(12) ,topLeft:Radius.circular(12) ,bottomRight:Radius.circular(12) ,topRight:Radius.circular(0) ),
+                         child: Image.file(file!,)),
+
                    ],
                  ),
                ),
-               Container(
-                   child: questionTextField()),
+               Spacer(),
+               TextFormField(
+                 controller: questionController,
+                 maxLines: 3,
+                 minLines: 1,
+                 textAlign: TextAlign.start,
+                 cursorColor: Colors.white,
+                 style: TextStyle(color: Colors.white),
+                 decoration: InputDecoration(
+                   fillColor: Color(0xff18222E),
+                   filled: true,
+                   prefixIcon:Padding(
+                     padding: const EdgeInsets.symmetric(horizontal: 12),
+                     child: IconButton(onPressed: () {
+                        getImage();
+                     }, icon: Icon(Icons.add_photo_alternate_outlined)),
+                   ),
+                   prefixIconColor: Colors.white,
+                   suffixIcon: Padding(
+                     padding: const EdgeInsets.symmetric(horizontal: 12),
+                     child: IconButton(onPressed: () {
+                       send();
+                     }, icon: Icon(Icons.send)),
+                   ),
+                   suffixIconColor: Colors.white,
+                   border: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(28),
+                   ),
+                   focusedBorder: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(28),
+                     borderSide: BorderSide(style: BorderStyle.none),
+                   ),
+                   enabledBorder: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(28),
+                     borderSide: BorderSide(style: BorderStyle.none),
+                   ),
+                   hintText: 'Enter your Question',
+                   hintStyle: TextStyle(fontSize: 18,fontWeight:FontWeight.w400 ,color: Colors.white,),
+                   floatingLabelBehavior: FloatingLabelBehavior.never,
+                 ),
+               )
+               //QuestionTextField(controller: questionController,maxLines: 3,onSendButtonClicked: send,)
              ],
            ),
          ),
@@ -65,4 +123,11 @@ static const String routeName = 'Home_Screen';
      ),
     );
   }
+  void send(){
+  index =1;
+  setState(() {
+
+  });
+  }
 }
+

@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+typedef OnSendButtonClicked = void Function();
+class QuestionTextField extends StatelessWidget {
+  int? maxLines;
+  TextEditingController? controller;
+  OnSendButtonClicked onSendButtonClicked;
 
-class questionTextField extends StatelessWidget {
-
+  QuestionTextField({ this.controller , this.maxLines,required this.onSendButtonClicked,});
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      minLines: 1,
       textAlign: TextAlign.start,
       cursorColor: Colors.white,
       style: TextStyle(color: Colors.white),
@@ -21,7 +28,7 @@ class questionTextField extends StatelessWidget {
         suffixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: IconButton(onPressed: () {
-
+            onSendButtonClicked();
           }, icon: Icon(Icons.send)),
         ),
         suffixIconColor: Colors.white,
