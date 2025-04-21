@@ -19,10 +19,10 @@ class MyApplication extends StatelessWidget{
       splashScreen.routeName : (context) => splashScreen(),
       loginScreen.routeName : (context) => loginScreen(),
       registerScreen.routeName : (context) => registerScreen(),
-       homeScreen.routeName : (context) => homeScreen(),
+       HomeScreen.routeName : (context) => HomeScreen(),
        settings_screen.routeName : (context) => settings_screen(),
      },
-     initialRoute: homeScreen.routeName ,
+     initialRoute: HomeScreen.routeName ,
      theme: MyThemeData.lightTheme,
    );
   }

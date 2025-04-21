@@ -4,6 +4,7 @@ class MyThemeData {
 
   static ThemeData lightTheme = ThemeData(
     scaffoldBackgroundColor: Colors.transparent,
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: Color(0xff0B182D)),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -18,6 +19,6 @@ class MyThemeData {
       iconTheme: IconThemeData(
         color: Colors.white
       )
-    )
+    ),
   );
 }
