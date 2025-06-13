@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vqa_app/firebase_error_codes/firebase_error_codes.dart';
 import 'package:vqa_app/utils/email_format.dart';
 import 'package:vqa_app/view/home/login/login_screen.dart';
 import 'package:vqa_app/view/widgets/custom_text_form_field.dart';
+
+import '../../../utils/dialog_utils.dart';
 
 class registerScreen extends StatefulWidget {
   static const String routeName = 'register_screen';
@@ -159,9 +163,29 @@ class _registerScreenState extends State<registerScreen> {
     );
   }
 
-  void createAccount() {
+  void createAccount() async {
     if(formKey.currentState?.validate() == false){
       return;
     }
+    try {
+      DialogUtils.showLoadingDialog(context, 'Loading...');
+      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      DialogUtils.hideDialog(context);
+      DialogUtils.showMessage(context, 'Account Created Successfully',icon: Icon(Icons.check_circle,color: Colors.green ),postiveActionTitle: 'Ok',posAction: () {
+        Navigator.pushReplacementNamed(context, loginScreen.routeName);
+      },);
+    }on FirebaseAuthException catch (e) {
+      if (e.code == FirebaseErrorCodes.weakPassword) {
+        print('The password provided is too weak.');
+      } else if (e.code == FirebaseErrorCodes.emailAlreadyInUse) {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+
   }
 }

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vqa_app/view/home/home_drawer.dart';
-import 'package:vqa_app/view/widgets/image_widget.dart';
 import 'package:vqa_app/view/widgets/question_text_field.dart';
 import 'package:vqa_app/view/widgets/question_widget.dart';
 
@@ -28,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
 
   // Initialize ApiManager
-  final apiManager = ApiManager(baseUrl: 'https://3526-34-142-174-17.ngrok-free.app/');
+  final apiManager = ApiManager(baseUrl: 'https://950c-34-168-247-117.ngrok-free.app/');
 
   Future<void> getImage() async {
     // Show a bottom sheet with options for Camera and Gallery

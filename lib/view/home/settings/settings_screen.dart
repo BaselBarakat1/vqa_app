@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vqa_app/view/home/home_screen.dart';
 import 'package:vqa_app/view/home/login/login_screen.dart';
+
+import '../../../utils/dialog_utils.dart';
 
 class settings_screen extends StatefulWidget{
 static const String routeName = 'Settings_Screen';
@@ -64,7 +67,8 @@ bool isSwitched = false;
               SizedBox(height: 24,),
               InkWell(
                 onTap: () {
-                 Navigator.pushReplacementNamed(context, loginScreen.routeName);//Edit
+                 signOut();
+
                 },
                 child: Row(
                   children: [
@@ -80,5 +84,18 @@ bool isSwitched = false;
         ),
       ),
     );
+  }
+
+  void signOut() async {
+    DialogUtils.showMessage(context, 'Are you sure you want to logout ?',postiveActionTitle: 'Ok',posAction: () async {
+      await FirebaseAuth.instance.signOut();
+      Navigator.pushReplacementNamed(context, loginScreen.routeName);
+    },
+      negativeActionTitle: 'Cancel',
+    negAction: () {
+      Navigator.pop(context);
+    },
+    );
+
   }
 }
