@@ -1,7 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vqa_app/firebase_error_codes/firebase_error_codes.dart';
 import 'package:vqa_app/utils/email_format.dart';
+import 'package:vqa_app/view/home/home_screen.dart';
 import 'package:vqa_app/view/home/register/register_screen.dart';
 import 'package:vqa_app/view/widgets/custom_text_form_field.dart';
+
+import '../../../utils/dialog_utils.dart';
 
 class loginScreen extends StatefulWidget {
   static const String routeName = 'login_screen';
@@ -107,9 +112,28 @@ class _loginScreenState extends State<loginScreen> {
     );
   }
 
-  void login() {
+  void login() async{
     if (formKey.currentState?.validate() == false) {
       return;
+    }
+    try {
+      DialogUtils.showLoadingDialog(context, 'Loading...');
+      var credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );DialogUtils.hideDialog(context);
+      DialogUtils.showMessage(context, 'Logged In Successfully',
+        icon: Icon(Icons.check_circle, color: Colors.green,),
+        postiveActionTitle: 'OK',
+        posAction: () {
+          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+        },);
+    }on FirebaseAuthException catch (e) {
+      if (e.code == FirebaseErrorCodes.userNotFound) {
+        print('No user found for that email.');
+      } else if (e.code == FirebaseErrorCodes.wrongPassword) {
+        print('Wrong password provided for that user.');
+      }
     }
   }
 }
