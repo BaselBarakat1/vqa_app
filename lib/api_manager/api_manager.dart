@@ -3,8 +3,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../model/predict_request.dart';
-import '../model/predict_response.dart';
+import 'package:vqa_app/database/model/predict_request.dart';
+import 'package:vqa_app/database/model/predict_response.dart';
 
 class ApiManager {
   final String baseUrl;

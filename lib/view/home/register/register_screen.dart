@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vqa_app/auth_provider/auth_provider.dart';
+import 'package:vqa_app/database/model/user.dart'as myUser;
+import 'package:vqa_app/database/user_dao.dart';
 import 'package:vqa_app/firebase_error_codes/firebase_error_codes.dart';
 import 'package:vqa_app/utils/email_format.dart';
 import 'package:vqa_app/view/home/login/login_screen.dart';
@@ -40,7 +44,7 @@ class _registerScreenState extends State<registerScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text('Create Account',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black)),
+          title: Text('Create Account',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white)),
           backgroundColor: Colors.transparent,
           centerTitle: true,
         ),
@@ -164,27 +168,28 @@ class _registerScreenState extends State<registerScreen> {
   }
 
   void createAccount() async {
+    var authProvider = Provider.of<MyAuthProvider>(context,listen: false);
+
     if(formKey.currentState?.validate() == false){
       return;
     }
     try {
       DialogUtils.showLoadingDialog(context, 'Loading...');
-      var credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
+      authProvider.register(userNameController.text, emailController.text, passwordController.text);
       DialogUtils.hideDialog(context);
       DialogUtils.showMessage(context, 'Account Created Successfully',icon: Icon(Icons.check_circle,color: Colors.green ),postiveActionTitle: 'Ok',posAction: () {
         Navigator.pushReplacementNamed(context, loginScreen.routeName);
       },);
     }on FirebaseAuthException catch (e) {
       if (e.code == FirebaseErrorCodes.weakPassword) {
-        print('The password provided is too weak.');
+        DialogUtils.showMessage(context, 'The password provided is too weak.',postiveActionTitle: 'Ok');
+        //print('The password provided is too weak.');
       } else if (e.code == FirebaseErrorCodes.emailAlreadyInUse) {
-        print('The account already exists for that email.');
+        DialogUtils.showMessage(context, 'The account already exists for that email.',postiveActionTitle: 'Ok');
+        //print('The account already exists for that email.');
       }
     } catch (e) {
-      print(e);
+      DialogUtils.showMessage(context, 'Something went wrong.',postiveActionTitle: 'Ok');
     }
 
   }

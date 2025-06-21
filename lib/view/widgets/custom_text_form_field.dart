@@ -42,9 +42,10 @@ class customTextFormField extends StatelessWidget {
                   width: 1,
                 )
             ),
-            label: Text(labelText),
-            labelStyle: TextStyle(color:Color(0xffB3B3B3) ,fontSize: 16,fontWeight: FontWeight.w500),
-            floatingLabelStyle: TextStyle(color: Color(0xff2C2C2C))
+            //label: Text(labelText),
+            hintText: labelText,
+            //labelStyle: TextStyle(color:Color(0xffB3B3B3) ,fontSize: 16,fontWeight: FontWeight.w500),
+            //floatingLabelStyle: TextStyle(color: Color(0xff2C2C2C))
 
         ),
       ),

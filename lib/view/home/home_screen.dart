@@ -1,13 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:vqa_app/auth_provider/auth_provider.dart';
+import 'package:vqa_app/database/history_dao.dart';
+import 'package:vqa_app/database/model/conversation_entry.dart';
+import 'package:vqa_app/database/model/history.dart';
+import 'package:vqa_app/database/model/predict_request.dart';
 import 'package:vqa_app/view/home/home_drawer.dart';
 import 'package:vqa_app/view/widgets/question_text_field.dart';
 import 'package:vqa_app/view/widgets/question_widget.dart';
 
 import '../../api_manager/api_manager.dart';
-import '../../model/predict_request.dart';
-import '../../model/conversation_entry.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'Home_Screen';
@@ -20,14 +24,38 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   File? file;
+  File? currentContextImage;
   TextEditingController questionController = TextEditingController();
   bool isLoading = false;
   String apiError = '';
   List<ConversationEntry> conversationEntries = [];
   final ScrollController _scrollController = ScrollController();
 
+  void _showFullScreenImage(File imageFile) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.white),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              child: Image.file(
+                imageFile,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   // Initialize ApiManager
-  final apiManager = ApiManager(baseUrl: 'https://950c-34-168-247-117.ngrok-free.app/');
+  final apiManager = ApiManager(baseUrl: 'https://flowing-locust-coherent.ngrok-free.app');
 
   Future<void> getImage() async {
     // Show a bottom sheet with options for Camera and Gallery
@@ -47,6 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (image != null) {
                     setState(() {
                       file = File(image.path);
+                      // When new image is selected, update context
+                      currentContextImage = File(image.path);
                     });
                   }
                 },
@@ -61,6 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (image != null) {
                     setState(() {
                       file = File(image.path);
+                      // When new image is selected, update context
+                      currentContextImage = File(image.path);
                     });
                   }
                 },
@@ -73,22 +105,108 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> send() async {
-    if (file == null) {
+    var authProvider = Provider.of<MyAuthProvider>(context,listen: false);
+    final currentQuestion = questionController.text.trim();
+    final sentTime = DateTime.now();
+
+    // Case 1: Only image, no question
+    if (currentQuestion.isEmpty && file != null) {
       setState(() {
-        apiError = 'Please select an image';
+        conversationEntries.add(
+          ConversationEntry(
+            image: File(file!.path),
+            question: '', // Empty question
+            answer: 'Please add a question about this image.',
+            timestamp: sentTime,
+          ),
+        );
+        // Update context but don't clear the image yet
+        currentContextImage = file!;
+        file = null; // Clear staged image
+        apiError = ''; // Clear any existing errors
       });
-      return;
-    }
-    if (questionController.text.trim().isEmpty) {
-      setState(() {
-        apiError = 'Please enter a question';
+
+      // Scroll to bottom
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       });
       return;
     }
 
-    final currentImage = file!;
-    final currentQuestion = questionController.text.trim();
-    final sentTime = DateTime.now();
+    // Case 2: Only question, no image and no context
+    if (currentQuestion.isNotEmpty && file == null && currentContextImage == null) {
+      setState(() {
+        conversationEntries.add(
+          ConversationEntry(
+            image: File(''), // Empty file path since no image
+            question: currentQuestion,
+            answer: 'Please select an image first to ask questions about it.',
+            timestamp: sentTime,
+          ),
+        );
+        questionController.clear();
+        apiError = ''; // Clear any existing errors
+      });
+
+      // Scroll to bottom
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+      return;
+    }
+
+// Case 3: No question and no image - do nothing (silent return)
+    if (currentQuestion.isEmpty && file == null && currentContextImage == null) {
+      return; // Simply return without doing anything
+    }
+
+// Case 4: No question but has context image - create a chat response
+    if (currentQuestion.isEmpty && currentContextImage != null) {
+      setState(() {
+        conversationEntries.add(
+          ConversationEntry(
+            image: File(''), // No image to show since it's just a reminder
+            question: '', // Empty question
+            answer: 'Please enter a question about the image.',
+            timestamp: sentTime,
+          ),
+        );
+        apiError = ''; // Clear any existing errors
+      });
+
+      // Scroll to bottom
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+      return;
+    }
+
+    // Determine which image to use for the API call
+    File? imageToSend;
+
+    if (file != null) {
+      // New image uploaded, use it and update context
+      imageToSend = file!;
+      currentContextImage = file!;
+    } else if (currentContextImage != null) {
+      // No new image, but we have context image, use context image
+      imageToSend = currentContextImage!;
+    }
+
+    // Create a copy of the image file for the conversation entry
+    final imageForEntry = File(imageToSend!.path);
 
     setState(() {
       isLoading = true;
@@ -96,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     final request = PredictRequest(
-      image: currentImage,
+      image: imageToSend,
       prompt: currentQuestion,
     );
 
@@ -109,12 +227,13 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         conversationEntries.add(
           ConversationEntry(
-            image: currentImage,
+            image: imageForEntry,
             question: currentQuestion,
             answer: response.response,
             timestamp: sentTime,
           ),
         );
+        // Clear the staged image after sending (but keep context)
         file = null;
         questionController.clear();
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -126,10 +245,19 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     });
+    if (response.response != null && response.response!.isNotEmpty) {
+      History history = History(
+        question: currentQuestion,
+        answer: response.response!,
+        imageFile: imageForEntry,
+      );
+      historyDao.addHistory(authProvider.databaseUser!.id!, history);
+    }
   }
 
   void clearChat() {
     setState(() {
+      currentContextImage = null;
       conversationEntries.clear();
       file = null;
       questionController.clear();
@@ -210,6 +338,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: conversationEntries.length,
                             itemBuilder: (context, index) {
                               final entry = conversationEntries[index];
+                              final showImage = entry.image.path.isNotEmpty && (index == 0 ||
+                                  (index > 0 && entry.image.path != conversationEntries[index - 1].image.path));
                               return Column(
                                 children: [
                                   // Centered Timestamp
@@ -230,29 +360,42 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        // Question
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 8),
-                                          child: questionWidget(
-                                            Question: entry.question,
+                                        // Question (only show if question exists)
+                                        if (entry.question.isNotEmpty) ...[
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 8),
+                                            child: questionWidget(
+                                              Question: entry.question,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        // Image
-                                        ClipRRect(
-                                          borderRadius: const BorderRadius.only(
-                                            bottomLeft: Radius.circular(12),
-                                            topLeft: Radius.circular(12),
-                                            bottomRight: Radius.circular(12),
-                                            topRight: Radius.circular(0),
+                                          const SizedBox(height: 12),
+                                        ],
+
+                                        // Image (only show if it's a new image or first message)
+                                        if (showImage)
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(right: 8),
+                                              child: GestureDetector(
+                                                onTap: () => _showFullScreenImage(entry.image),
+                                                child: ClipRRect(
+                                                  borderRadius: const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(12),
+                                                    topLeft: Radius.circular(12),
+                                                    bottomRight: Radius.circular(12),
+                                                    topRight: Radius.circular(0),
+                                                  ),
+                                                  child: Image.file(
+                                                    entry.image,
+                                                    width: 250,
+                                                    height: 250,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          child: Image.file(
-                                            entry.image,
-                                            width: 250,
-                                            height: 250,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
                                       ],
                                     ),
                                   ),

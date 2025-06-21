@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vqa_app/auth_provider/auth_provider.dart';
+import 'package:vqa_app/database/user_dao.dart';
 import 'package:vqa_app/firebase_error_codes/firebase_error_codes.dart';
 import 'package:vqa_app/utils/email_format.dart';
 import 'package:vqa_app/view/home/home_screen.dart';
@@ -113,26 +116,22 @@ class _loginScreenState extends State<loginScreen> {
   }
 
   void login() async{
+    var authProvider = Provider.of<MyAuthProvider>(context,listen: false);
+
     if (formKey.currentState?.validate() == false) {
       return;
     }
     try {
       DialogUtils.showLoadingDialog(context, 'Loading...');
-      var credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );DialogUtils.hideDialog(context);
-      DialogUtils.showMessage(context, 'Logged In Successfully',
-        icon: Icon(Icons.check_circle, color: Colors.green,),
-        postiveActionTitle: 'OK',
-        posAction: () {
-          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
-        },);
+      await authProvider.login(emailController.text, passwordController.text);
+      DialogUtils.hideDialog(context);
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     }on FirebaseAuthException catch (e) {
+      DialogUtils.hideDialog(context);
       if (e.code == FirebaseErrorCodes.userNotFound) {
-        print('No user found for that email.');
+        DialogUtils.showMessage(context, 'Wrong Email',postiveActionTitle: 'Ok');
       } else if (e.code == FirebaseErrorCodes.wrongPassword) {
-        print('Wrong password provided for that user.');
+        DialogUtils.showMessage(context, 'Password',postiveActionTitle: 'Ok');
       }
     }
   }

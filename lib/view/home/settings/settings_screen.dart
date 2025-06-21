@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vqa_app/view/home/home_screen.dart';
 import 'package:vqa_app/view/home/login/login_screen.dart';
 
@@ -53,15 +54,18 @@ bool isSwitched = false;
               SizedBox(height: 20,),
               InkWell(
                 onTap: () {
-
+                  _launchURL('https://gilded-phoenix-129945.netlify.app/');
                 },
-                child: Row(
-                  children: [
-                    Icon(Icons.help_outline,color: Colors.white,size: 32),
-                    Container(
-                        padding: EdgeInsets.only(left: 20),
-                        child: Text('Help',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500,color: Colors.white),)),
-                  ],
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical:12 ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.help_outline,color: Colors.white,size: 32),
+                      Container(
+                          padding: EdgeInsets.only(left: 20),
+                          child: Text('Help',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500,color: Colors.white),)),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 24,),
@@ -98,4 +102,12 @@ bool isSwitched = false;
     );
 
   }
+
+Future<void> _launchURL(String url) async {
+  if (await canLaunchUrl(Uri.parse(url))) {
+    await launchUrl(Uri.parse(url));
+  } else {
+    throw 'Could not launch $url';
+  }
+}
 }

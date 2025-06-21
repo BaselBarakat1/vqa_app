@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vqa_app/view/home/history/history_screen.dart';
 import 'package:vqa_app/view/home/settings/settings_screen.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -14,7 +15,7 @@ class HomeDrawer extends StatelessWidget {
          children: [
            InkWell(
              onTap: () {
-
+               Navigator.pushNamed(context, historyScreen.routeName);
              },
              child: Padding(
                padding: const EdgeInsets.all(12),
