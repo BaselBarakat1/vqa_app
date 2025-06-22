@@ -3,24 +3,24 @@ import 'dart:io';
 class History{
   String? id;
   String? question;
-  File? imageFile;
+  String? imageUrl;
   String? answer;
   static const String collectionName = 'Histories';
 
-  History({this.question,this.imageFile,this.answer,this.id});
+  History({this.question,this.imageUrl,this.answer,this.id});
 
   Map<String,dynamic> toFireStore(){
     return {
       'id' : id,
       'question' : question,
-      'imageFile' : imageFile?.path,
+      'imageUrl' : imageUrl,
       'answer' : answer,
     };
   }
   History.fromFireStore(Map<String,dynamic>? data) : this(
     id: data?['id'],
     question: data?['question'],
-    imageFile: data?['imageFile'],
+    imageUrl: data?['imageUrl'],
     answer: data?['answer'],
   );
 }

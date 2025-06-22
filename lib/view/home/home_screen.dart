@@ -249,9 +249,8 @@ class _HomeScreenState extends State<HomeScreen> {
       History history = History(
         question: currentQuestion,
         answer: response.response!,
-        imageFile: imageForEntry,
       );
-      historyDao.addHistory(authProvider.databaseUser!.id!, history);
+      await historyDao.addHistory(authProvider.databaseUser!.id!, history, imageFile: imageForEntry);
     }
   }
 
@@ -263,6 +262,35 @@ class _HomeScreenState extends State<HomeScreen> {
       questionController.clear();
       apiError = '';
     });
+  }
+
+  // Added welcome message widget
+  Widget _buildWelcomeMessage() {
+    var authProvider = Provider.of<MyAuthProvider>(context, listen: false);
+
+    String getFirstName() {
+      String? displayName = authProvider.databaseUser?.userName;
+      if (displayName != null && displayName.isNotEmpty) {
+        return displayName.trim().split(' ').first;
+      }
+      return 'there';
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+        child: Text(
+          'Welcome ${getFirstName()}!\nWhat do you want to ask today?',
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+            height: 1.4,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   @override
@@ -331,6 +359,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
                       child: Column(
                         children: [
+                          // Welcome Message - Show only when no conversations
+                          if (conversationEntries.isEmpty && !isLoading) ...[
+                            _buildWelcomeMessage(),
+                            SizedBox(height: 24),
+                          ],
+
                           // Chat history
                           ListView.builder(
                             shrinkWrap: true,

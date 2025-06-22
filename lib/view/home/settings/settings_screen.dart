@@ -90,18 +90,35 @@ bool isSwitched = false;
     );
   }
 
-  void signOut() async {
-    DialogUtils.showMessage(context, 'Are you sure you want to logout ?',postiveActionTitle: 'Ok',posAction: () async {
-      await FirebaseAuth.instance.signOut();
-      Navigator.pushReplacementNamed(context, loginScreen.routeName);
+void signOut() async {
+  DialogUtils.showMessage(
+    context,
+    'Are you sure you want to logout?',
+    postiveActionTitle: 'Logout',
+    posAction: () async {
+      Navigator.pop(context); // Close dialog first
+
+      try {
+        await FirebaseAuth.instance.signOut();
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          loginScreen.routeName,
+              (route) => false,
+        );
+      } catch (e) {
+        DialogUtils.showMessage(
+          context,
+          'Failed to logout. Please try again.',
+          postiveActionTitle: 'Ok',
+        );
+      }
     },
-      negativeActionTitle: 'Cancel',
+    negativeActionTitle: 'Cancel',
     negAction: () {
       Navigator.pop(context);
     },
-    );
-
-  }
+  );
+}
 
 Future<void> _launchURL(String url) async {
   if (await canLaunchUrl(Uri.parse(url))) {

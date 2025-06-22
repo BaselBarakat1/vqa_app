@@ -44,8 +44,14 @@ dependencies:
   cloud_firestore:
   provider:
   flutter_slidable:
+  firebase_storage:
 
 dev_dependencies:
+  flutter_launcher_icons:
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
   flutter_test:
     sdk: flutter
 

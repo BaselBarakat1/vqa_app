@@ -27,4 +27,5 @@ class MyAuthProvider extends ChangeNotifier{
    databaseUser = user;
    firebaseAuthUser = credential.user;
   }
+
 }
