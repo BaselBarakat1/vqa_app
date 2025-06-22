@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.3.0
   cloud_firestore:
   provider:
+  flutter_slidable:
 
 dev_dependencies:
   flutter_test:

@@ -26,5 +26,9 @@ class historyDao{
     var stream = historyCollection.snapshots();
     yield* stream.map((querySnapshot) => querySnapshot.docs.map((e) => e.data()).toList());
   }
+  static Future<void> deleteHistory( String uid , String historyId ){
+    var historyCollection = getHistoryCollecton(uid);
+    return historyCollection.doc(historyId).delete();
+  }
 
 }
